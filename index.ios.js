@@ -8,6 +8,7 @@ var React = require('react-native');
 var {
   AppRegistry,
   StyleSheet,
+  AsyncStorage,
   Text,
   View,
 } = React;
@@ -16,22 +17,33 @@ var Login = require('./login.ios');
 var App = require('./app.ios');
 
 var surroundfm = React.createClass({
+  token: undefined,
+
+  componentWillMount() {
+    var self = this;
+    AsyncStorage.getItem('token', function(token) {
+      console.log(token);
+      self.setState({ token: token });
+    });
+  },
+
   getInitialState: function() {
     return {
-      authenticated: false
+      token: undefined
     };
   },
 
   render: function() {
     return (
       <View style={styles.container}>
-        {this.state.authenticated ? <App token={this.state.token}/> :
+        {this.state.token != undefined ? <App token={this.state.token}/> :
           <Login authenticate={this.authenticate} />}
       </View>
     );
   },
 
   authenticate: function(token) {
+    AsyncStorage.setItem('token', token);
     this.setState({ authenticated: true, token: token });
   }
 });
